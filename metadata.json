@@ -1,0 +1,7 @@
+{
+  "name": "GameDev Academy",
+  "description": "Unity & Unreal Engine — Learn Game Development from Zero to Advanced. Master game mechanics, physics, shaders, AI, and production pipelines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
