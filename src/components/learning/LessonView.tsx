@@ -188,6 +188,28 @@ export const LessonView: React.FC = () => {
             </span>
           ))}
         </div>
+
+        {/* Hero Image Illustration */}
+        {lesson.heroImage && (
+          <div className="mt-5 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/80">
+            <img
+              src={lesson.heroImage}
+              alt={lesson.title[language] || lesson.title.en}
+              referrerPolicy="no-referrer"
+              className="h-52 sm:h-72 w-full object-cover brightness-95 contrast-105"
+            />
+            {lesson.heroImageCaption && (
+              <div className="flex items-center gap-2 border-t border-slate-800/80 bg-slate-900/90 px-4 py-2 text-[11px] text-slate-400">
+                <span className="font-semibold text-slate-300">
+                  {language === 'th' ? 'ภาพประกอบ:' : 'Visual Guide:'}
+                </span>
+                <span>
+                  {lesson.heroImageCaption[language] || lesson.heroImageCaption.en}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* 01. What will you learn? & 02. Prerequisites */}
@@ -352,6 +374,23 @@ export const LessonView: React.FC = () => {
                   </div>
                 </div>
               )}
+
+              {/* Step Image Illustration if provided */}
+              {step.imageUrl && (
+                <div className="ml-10 mt-3 overflow-hidden rounded-xl border border-slate-800 bg-slate-900/50">
+                  <img
+                    src={step.imageUrl}
+                    alt={step.title[language] || step.title.en}
+                    referrerPolicy="no-referrer"
+                    className="h-44 sm:h-56 w-full object-cover brightness-95"
+                  />
+                  {step.imageCaption && (
+                    <div className="border-t border-slate-800/80 bg-slate-950/80 px-3 py-1.5 text-[11px] text-slate-400">
+                      {step.imageCaption[language] || step.imageCaption.en}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -363,8 +402,8 @@ export const LessonView: React.FC = () => {
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 px-1">
             07 & 08. {language === 'th' ? 'ตัวอย่างโค้ดจริงและการวิเคราะห์' : 'Production Code Example & Breakdown'}
           </div>
-          {lesson.codeExamples.map((example) => (
-            <CodeBlock key={example.id} example={example} language={language} />
+          {lesson.codeExamples.map((example, exIdx) => (
+            <CodeBlock key={example.id || `ex-${exIdx}`} example={example} language={language} />
           ))}
         </div>
       )}
@@ -404,7 +443,7 @@ export const LessonView: React.FC = () => {
                 </div>
                 <div>
                   <span className={`text-xs ${isDone ? 'line-through text-slate-400' : 'font-medium'}`}>
-                    {task.task[language] || task.task.en}
+                    {task.task ? (task.task[language] || task.task.en) : (task.title ? (task.title[language] || task.title.en) : '')}
                   </span>
                   {task.hints && (
                     <p className="text-[11px] text-slate-400 mt-0.5">
@@ -419,83 +458,98 @@ export const LessonView: React.FC = () => {
       </div>
 
       {/* 10. Mini Challenge */}
-      <div className="my-8 rounded-2xl border border-purple-500/30 bg-purple-950/10 p-5">
-        <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-400">
-            <Lightbulb className="h-4 w-4" />
-            <span>10. {language === 'th' ? 'โจทย์ท้าทาย (Mini Challenge)' : 'Mini Challenge'}</span>
+      {lesson.miniChallenge && (
+        <div className="my-8 rounded-2xl border border-purple-500/30 bg-purple-950/10 p-5">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-400">
+              <Lightbulb className="h-4 w-4" />
+              <span>10. {language === 'th' ? 'โจทย์ท้าทาย (Mini Challenge)' : 'Mini Challenge'}</span>
+            </div>
+            <span className="rounded bg-purple-500/20 px-2 py-0.5 text-[10px] font-mono font-bold text-purple-300">
+              {'⭐'.repeat(lesson.miniChallenge.difficulty || 3)} Level
+            </span>
           </div>
-          <span className="rounded bg-purple-500/20 px-2 py-0.5 text-[10px] font-mono font-bold text-purple-300">
-            {'⭐'.repeat(lesson.miniChallenge.difficulty)} Level
-          </span>
-        </div>
 
-        <h4 className="text-sm font-bold text-white mb-1.5">
-          {lesson.miniChallenge.title[language] || lesson.miniChallenge.title.en}
-        </h4>
-        <p className="text-xs leading-relaxed text-slate-300 mb-3">
-          {lesson.miniChallenge.description[language] || lesson.miniChallenge.description.en}
-        </p>
+          <h4 className="text-sm font-bold text-white mb-1.5">
+            {lesson.miniChallenge.title ? (lesson.miniChallenge.title[language] || lesson.miniChallenge.title.en) : (lesson.miniChallenge.prompt ? (lesson.miniChallenge.prompt[language] || lesson.miniChallenge.prompt.en) : 'Mini Challenge')}
+          </h4>
+          {lesson.miniChallenge.description && (
+            <p className="text-xs leading-relaxed text-slate-300 mb-3">
+              {lesson.miniChallenge.description[language] || lesson.miniChallenge.description.en}
+            </p>
+          )}
 
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-purple-500/20">
-          <p className="text-[11px] text-purple-300/80 italic">
-            Hint: {lesson.miniChallenge.hints[language] || lesson.miniChallenge.hints.en}
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-purple-500/20">
+            <p className="text-[11px] text-purple-300/80 italic">
+              Hint: {lesson.miniChallenge.hints ? (lesson.miniChallenge.hints[language] || lesson.miniChallenge.hints.en) : (lesson.miniChallenge.hint ? (lesson.miniChallenge.hint[language] || lesson.miniChallenge.hint.en) : '')}
+            </p>
 
-          <button
-            onClick={() => setShowChallengeSolution(!showChallengeSolution)}
-            className="flex items-center gap-1.5 rounded-lg border border-purple-500/40 bg-purple-900/30 px-3 py-1 text-xs font-semibold text-purple-200 transition hover:bg-purple-800/40"
-          >
-            <Eye className="h-3.5 w-3.5" />
-            <span>{showChallengeSolution ? 'Hide Solution' : 'Reveal Solution'}</span>
-          </button>
-        </div>
-
-        {showChallengeSolution && lesson.miniChallenge.solution && (
-          <div className="mt-3 rounded-xl border border-purple-500/40 bg-slate-950 p-3 text-xs text-purple-200 font-mono">
-            {lesson.miniChallenge.solution}
+            <button
+              onClick={() => setShowChallengeSolution(!showChallengeSolution)}
+              className="flex items-center gap-1.5 rounded-lg border border-purple-500/40 bg-purple-900/30 px-3 py-1 text-xs font-semibold text-purple-200 transition hover:bg-purple-800/40"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              <span>{showChallengeSolution ? 'Hide Solution' : 'Reveal Solution'}</span>
+            </button>
           </div>
-        )}
-      </div>
+
+          {showChallengeSolution && lesson.miniChallenge.solution && (
+            <div className="mt-3 rounded-xl border border-purple-500/40 bg-slate-950 p-3 text-xs text-purple-200 font-mono">
+              {typeof lesson.miniChallenge.solution === 'string'
+                ? lesson.miniChallenge.solution
+                : (lesson.miniChallenge.solution[language] || lesson.miniChallenge.solution.en)}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 11. Common Mistakes & Troubleshooting */}
-      {lesson.commonMistakes.length > 0 && (
+      {lesson.commonMistakes && lesson.commonMistakes.length > 0 && (
         <div className="my-8">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 px-1">
             11. {language === 'th' ? 'ข้อผิดพลาดที่พบบ่อย & วิธีแก้ไข' : 'Common Mistakes & Troubleshooting'}
           </div>
 
           <div className="space-y-3">
-            {lesson.commonMistakes.map((mistake, mIdx) => (
-              <div
-                key={mIdx}
-                className="rounded-2xl border border-rose-500/30 bg-rose-950/10 p-4 shadow-sm"
-              >
-                <div className="flex items-center gap-2 text-xs font-bold text-rose-400 mb-1.5">
-                  <AlertTriangle className="h-4 w-4 text-rose-500 shrink-0" />
-                  <span>{mistake.title[language] || mistake.title.en}</span>
-                </div>
+            {lesson.commonMistakes.map((mistake, mIdx) => {
+              const mTitle = mistake.title ? (mistake.title[language] || mistake.title.en) : (mistake.mistake ? (mistake.mistake[language] || mistake.mistake.en) : '');
+              const mProblem = mistake.problem ? (mistake.problem[language] || mistake.problem.en) : (mistake.mistake ? (mistake.mistake[language] || mistake.mistake.en) : '');
+              const mCause = mistake.cause ? (mistake.cause[language] || mistake.cause.en) : (mistake.why ? (mistake.why[language] || mistake.why.en) : '');
+              const mSolution = mistake.solution ? (mistake.solution[language] || mistake.solution.en) : (mistake.fix ? (mistake.fix[language] || mistake.fix.en) : '');
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 text-xs">
-                  <div className="rounded-xl border border-rose-500/20 bg-slate-950/60 p-3">
-                    <strong className="text-rose-400 block mb-1">
-                      ❌ {language === 'th' ? 'ปัญหา & สาเหตุ:' : 'The Problem:'}
-                    </strong>
-                    <p className="text-slate-300">{mistake.problem[language] || mistake.problem.en}</p>
-                    <p className="text-slate-400 text-[11px] mt-1 italic">
-                      Why: {mistake.cause[language] || mistake.cause.en}
-                    </p>
+              return (
+                <div
+                  key={mIdx}
+                  className="rounded-2xl border border-rose-500/30 bg-rose-950/10 p-4 shadow-sm"
+                >
+                  <div className="flex items-center gap-2 text-xs font-bold text-rose-400 mb-1.5">
+                    <AlertTriangle className="h-4 w-4 text-rose-500 shrink-0" />
+                    <span>{mTitle}</span>
                   </div>
 
-                  <div className="rounded-xl border border-emerald-500/30 bg-slate-950/60 p-3">
-                    <strong className="text-emerald-400 block mb-1">
-                      ✅ {language === 'th' ? 'วิธีแก้ไขที่ถูกต้อง:' : 'The Solution:'}
-                    </strong>
-                    <p className="text-slate-300">{mistake.solution[language] || mistake.solution.en}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 text-xs">
+                    <div className="rounded-xl border border-rose-500/20 bg-slate-950/60 p-3">
+                      <strong className="text-rose-400 block mb-1">
+                        ❌ {language === 'th' ? 'ปัญหา & สาเหตุ:' : 'The Problem:'}
+                      </strong>
+                      <p className="text-slate-300">{mProblem}</p>
+                      {mCause && (
+                        <p className="text-slate-400 text-[11px] mt-1 italic">
+                          Why: {mCause}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="rounded-xl border border-emerald-500/30 bg-slate-950/60 p-3">
+                      <strong className="text-emerald-400 block mb-1">
+                        ✅ {language === 'th' ? 'วิธีแก้ไขที่ถูกต้อง:' : 'The Solution:'}
+                      </strong>
+                      <p className="text-slate-300">{mSolution}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

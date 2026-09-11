@@ -27,7 +27,8 @@ export const QuizCard: React.FC<QuizCardProps> = ({ lessonId, quiz, language }) 
   const calculateScore = () => {
     let score = 0;
     quiz.forEach((q, idx) => {
-      if (selectedAnswers[idx] === q.correctAnswer) {
+      const correctAns = q.correctAnswer !== undefined ? q.correctAnswer : (q.correctIndex !== undefined ? q.correctIndex : 0);
+      if (selectedAnswers[idx] === correctAns) {
         score += 1;
       }
     });
@@ -86,13 +87,14 @@ export const QuizCard: React.FC<QuizCardProps> = ({ lessonId, quiz, language }) 
       {/* Questions list */}
       <div className="p-6 space-y-6">
         {quiz.map((q, qIdx) => {
+          const correctAns = q.correctAnswer !== undefined ? q.correctAnswer : (q.correctIndex !== undefined ? q.correctIndex : 0);
           const selectedOption = selectedAnswers[qIdx];
           const isAnswered = selectedOption !== undefined;
-          const isCorrect = isAnswered && selectedOption === q.correctAnswer;
+          const isCorrect = isAnswered && selectedOption === correctAns;
 
           return (
             <div
-              key={q.id}
+              key={q.id || `q-${qIdx}`}
               className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4 transition"
             >
               {/* Question Header */}
@@ -112,7 +114,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({ lessonId, quiz, language }) 
                   let optionStyle = 'border-slate-800 bg-slate-900/80 hover:border-slate-700 hover:bg-slate-850 text-slate-300';
 
                   if (submitted) {
-                    if (oIdx === q.correctAnswer) {
+                    if (oIdx === correctAns) {
                       optionStyle = 'border-emerald-500/60 bg-emerald-950/40 text-emerald-300 ring-1 ring-emerald-500/50 font-semibold';
                     } else if (isSelected && !isCorrect) {
                       optionStyle = 'border-rose-500/60 bg-rose-950/40 text-rose-300 line-through';
@@ -131,7 +133,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({ lessonId, quiz, language }) 
                       className={`flex w-full items-center justify-between rounded-lg border p-3 text-left text-xs transition ${optionStyle}`}
                     >
                       <span>{option}</span>
-                      {submitted && oIdx === q.correctAnswer && (
+                      {submitted && oIdx === correctAns && (
                         <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-400 ml-2" />
                       )}
                       {submitted && isSelected && !isCorrect && (

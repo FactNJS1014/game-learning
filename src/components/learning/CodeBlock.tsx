@@ -20,7 +20,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ example, language }) => {
 
   return (
     <div
-      id={`code-block-${example.id}`}
+      id={`code-block-${example.id || example.title.toLowerCase().replace(/\s+/g, '-')}`}
       className="my-5 overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-xl"
     >
       {/* Code Header Bar */}
@@ -75,15 +75,19 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ example, language }) => {
             </span>
           </div>
           <ul className="space-y-1.5">
-            {(example.explanation[language] || example.explanation.en).map((item, idx) => (
-              <li
-                key={idx}
-                className="flex items-start gap-2 text-xs text-slate-400"
-              >
-                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500" />
-                <span>{item}</span>
-              </li>
-            ))}
+            {(() => {
+              const expl = example.explanation[language] || example.explanation.en;
+              const items = Array.isArray(expl) ? expl : [expl];
+              return items.map((item, idx) => (
+                <li
+                  key={idx}
+                  className="flex items-start gap-2 text-xs text-slate-400"
+                >
+                  <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500" />
+                  <span>{item}</span>
+                </li>
+              ));
+            })()}
           </ul>
         </div>
       )}

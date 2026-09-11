@@ -157,9 +157,22 @@ export const CatalogView: React.FC = () => {
           return (
             <div
               key={lesson.id}
-              className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-950/80 p-5 transition hover:border-slate-700 hover:bg-slate-900/60 shadow-md"
+              id={`lesson-card-${lesson.id}`}
+              className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-950/80 p-5 transition hover:border-slate-700 hover:bg-slate-900/60 shadow-md overflow-hidden"
             >
               <div>
+                {/* Lesson Thumbnail Cover */}
+                {lesson.heroImage && (
+                  <div className="mb-3.5 -mx-5 -mt-5 h-36 overflow-hidden border-b border-slate-800/80 bg-slate-900">
+                    <img
+                      src={lesson.heroImage}
+                      alt={lesson.title[language] || lesson.title.en}
+                      referrerPolicy="no-referrer"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 brightness-90 contrast-105"
+                    />
+                  </div>
+                )}
+
                 {/* Header Row */}
                 <div className="flex items-center justify-between gap-2 mb-2.5">
                   <div className="flex items-center gap-2">

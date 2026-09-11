@@ -14,13 +14,13 @@ export interface QuizScoreRecord {
 export type NoteItem = UserNote;
 
 export interface CodeExample {
-  id: string;
+  id?: string;
   title: string;
   language: 'csharp' | 'cpp' | 'blueprint' | 'json';
   code: string;
   explanation: {
-    en: string[];
-    th: string[];
+    en: string[] | string;
+    th: string[] | string;
   };
 }
 
@@ -40,6 +40,7 @@ export interface LessonStep {
   };
   codeSnippet?: string;
   codeLanguage?: string;
+  imageUrl?: string;
   imageCaption?: {
     en: string;
     th: string;
@@ -49,7 +50,11 @@ export interface LessonStep {
 
 export interface PracticeTask {
   id: string;
-  task: {
+  task?: {
+    en: string;
+    th: string;
+  };
+  title?: {
     en: string;
     th: string;
   };
@@ -57,29 +62,42 @@ export interface PracticeTask {
     en: string;
     th: string;
   };
+  completed?: boolean;
 }
 
 export interface CommonMistake {
-  title: {
+  title?: {
     en: string;
     th: string;
   };
-  problem: {
+  mistake?: {
     en: string;
     th: string;
   };
-  cause: {
+  problem?: {
     en: string;
     th: string;
   };
-  solution: {
+  cause?: {
+    en: string;
+    th: string;
+  };
+  why?: {
+    en: string;
+    th: string;
+  };
+  solution?: {
+    en: string;
+    th: string;
+  };
+  fix?: {
     en: string;
     th: string;
   };
 }
 
 export interface QuizQuestion {
-  id: string;
+  id?: string;
   question: {
     en: string;
     th: string;
@@ -88,7 +106,8 @@ export interface QuizQuestion {
     en: string[];
     th: string[];
   };
-  correctAnswer: number; // 0-indexed
+  correctAnswer?: number; // 0-indexed
+  correctIndex?: number;
   explanation: {
     en: string;
     th: string;
@@ -96,7 +115,24 @@ export interface QuizQuestion {
 }
 
 export interface VisualDiagramData {
-  type: 'game-loop' | 'gameobject-component' | 'transform' | 'physics-pipeline' | 'blueprint-flow' | 'ai-behavior-tree' | 'lifecycle' | 'network-flow';
+  type:
+    | 'game-loop'
+    | 'gameobject-component'
+    | 'transform'
+    | 'physics-pipeline'
+    | 'blueprint-flow'
+    | 'ai-behavior-tree'
+    | 'lifecycle'
+    | 'network-flow'
+    | 'fsm-states'
+    | 'object-pool'
+    | 'render-pipeline'
+    | 'save-load'
+    | 'enhanced-input'
+    | 'pbr-material'
+    | 'character-movement'
+    | 'scriptable-object'
+    | 'actor-component';
   title: {
     en: string;
     th: string;
@@ -113,6 +149,11 @@ export interface Lesson {
   level: LevelType;
   lessonNumber: number;
   slug: string;
+  heroImage?: string;
+  heroImageCaption?: {
+    en: string;
+    th: string;
+  };
   title: {
     en: string;
     th: string;
@@ -143,17 +184,19 @@ export interface Lesson {
   codeExamples: CodeExample[];
   practiceChecklist: PracticeTask[];
   miniChallenge: {
-    title: { en: string; th: string };
-    description: { en: string; th: string };
-    difficulty: 1 | 2 | 3 | 4 | 5;
-    hints: { en: string; th: string };
-    solution?: string;
+    title?: { en: string; th: string };
+    prompt?: { en: string; th: string };
+    description?: { en: string; th: string };
+    difficulty?: 1 | 2 | 3 | 4 | 5;
+    hint?: { en: string; th: string };
+    hints?: { en: string; th: string };
+    solution?: string | { en: string; th: string };
   };
   commonMistakes: CommonMistake[];
   quiz: QuizQuestion[];
-  summary: {
-    en: string[];
-    th: string[];
+  summary?: {
+    en: string[] | string;
+    th: string[] | string;
   };
   nextLessonId?: string;
   prevLessonId?: string;
