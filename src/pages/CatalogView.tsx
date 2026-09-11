@@ -21,13 +21,13 @@ export const CatalogView: React.FC = () => {
     language,
     filterEngine,
     setFilterEngine,
+    filterLevel,
+    setFilterLevel,
     selectLesson,
-    setActiveTab,
     progress,
     toggleBookmark,
   } = useApp();
 
-  const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredLessons = allLessons.filter((lesson) => {
@@ -35,9 +35,9 @@ export const CatalogView: React.FC = () => {
     if (filterEngine !== 'all' && lesson.engine !== filterEngine) return false;
 
     // Level match
-    if (selectedLevel !== 'all') {
-      if (selectedLevel === 'zero' && !lesson.startFromZero) return false;
-      if (selectedLevel !== 'zero' && lesson.level !== selectedLevel) return false;
+    if (filterLevel !== 'all') {
+      if (filterLevel === 'zero' && lesson.level !== 'zero' && !lesson.startFromZero) return false;
+      if (filterLevel !== 'zero' && lesson.level !== filterLevel) return false;
     }
 
     // Search query match
@@ -123,9 +123,9 @@ export const CatalogView: React.FC = () => {
           ].map((lvl) => (
             <button
               key={lvl.id}
-              onClick={() => setSelectedLevel(lvl.id)}
+              onClick={() => setFilterLevel(lvl.id as any)}
               className={`rounded-xl border px-3 py-1.5 text-xs font-medium transition ${
-                selectedLevel === lvl.id
+                filterLevel === lvl.id
                   ? 'border-slate-600 bg-slate-800 text-white font-bold'
                   : 'border-slate-800/80 bg-slate-950/60 text-slate-400 hover:text-white'
               }`}
@@ -151,8 +151,8 @@ export const CatalogView: React.FC = () => {
       {/* Lesson Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredLessons.map((lesson) => {
-          const isDone = progress.completedLessonIds.includes(lesson.id);
-          const isBookmarked = progress.bookmarkedLessonIds.includes(lesson.id);
+          const isDone = (progress.completedLessonIds || []).includes(lesson.id);
+          const isBookmarked = (progress.bookmarkedLessonIds || []).includes(lesson.id);
 
           return (
             <div
@@ -237,10 +237,7 @@ export const CatalogView: React.FC = () => {
                   )}
 
                   <button
-                    onClick={() => {
-                      selectLesson(lesson.id);
-                      setActiveTab('learning');
-                    }}
+                    onClick={() => selectLesson(lesson.id)}
                     className="flex items-center gap-1 rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-200 transition hover:bg-amber-500 hover:text-slate-950"
                   >
                     <span>{language === 'th' ? 'เริ่มเรียน' : 'Open Lesson'}</span>

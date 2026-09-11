@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   ActiveTab,
   EngineType,
+  LevelType,
   Language,
   Theme,
   UserProgressData,
@@ -17,10 +18,13 @@ interface AppContextType {
   selectLesson: (id: string) => void;
   filterEngine: EngineType | 'all';
   setFilterEngine: (engine: EngineType | 'all') => void;
+  filterLevel: LevelType | 'all';
+  setFilterLevel: (level: LevelType | 'all') => void;
   language: Language;
   setLanguage: (lang: Language) => void;
   theme: Theme;
   setTheme: (t: Theme) => void;
+  toggleTheme: () => void;
   searchModalOpen: boolean;
   setSearchModalOpen: (open: boolean) => void;
   progress: UserProgressData;
@@ -53,12 +57,35 @@ const initialProgress: UserProgressData = {
   unlockedAchievementIds: [],
 };
 
+const sanitizeProgress = (raw: any): UserProgressData => {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return { ...initialProgress };
+  }
+  return {
+    completedLessonIds: Array.isArray(raw.completedLessonIds) ? raw.completedLessonIds : [],
+    quizScores: raw.quizScores && typeof raw.quizScores === 'object' && !Array.isArray(raw.quizScores) ? raw.quizScores : {},
+    projectChecklists: raw.projectChecklists && typeof raw.projectChecklists === 'object' && !Array.isArray(raw.projectChecklists) ? raw.projectChecklists : {},
+    bookmarkedLessonIds: Array.isArray(raw.bookmarkedLessonIds) ? raw.bookmarkedLessonIds : [],
+    notes: raw.notes && typeof raw.notes === 'object' && !Array.isArray(raw.notes) ? raw.notes : {},
+    streakDays: typeof raw.streakDays === 'number' ? raw.streakDays : 3,
+    lastActiveDate: typeof raw.lastActiveDate === 'string' ? raw.lastActiveDate : new Date().toISOString().split('T')[0],
+    lastLessonId: typeof raw.lastLessonId === 'string' ? raw.lastLessonId : 'unity-zero-001',
+    unlockedAchievements: Array.isArray(raw.unlockedAchievements)
+      ? raw.unlockedAchievements
+      : Array.isArray(raw.unlockedAchievementIds)
+      ? raw.unlockedAchievementIds
+      : [],
+    unlockedAchievementIds: Array.isArray(raw.unlockedAchievementIds) ? raw.unlockedAchievementIds : [],
+  };
+};
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [selectedLessonId, setSelectedLessonId] = useState<string | null>('unity-zero-001');
   const [filterEngine, setFilterEngine] = useState<EngineType | 'all'>('all');
+  const [filterLevel, setFilterLevel] = useState<LevelType | 'all'>('all');
   const [language, setLanguageState] = useState<Language>('en');
   const [theme, setThemeState] = useState<Theme>('dark');
   const [searchModalOpen, setSearchModalOpen] = useState<boolean>(false);
@@ -68,7 +95,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return { ...initialProgress, ...JSON.parse(saved) };
+        return sanitizeProgress(JSON.parse(saved));
       }
     } catch {
       // ignore
@@ -109,11 +136,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [progress]);
 
-  // Check and unlock achievements
+  // Check and unlock achievements safely
   useEffect(() => {
     const newlyUnlocked: string[] = [];
+    const currentUnlocked = progress.unlockedAchievements || [];
     achievementsList.forEach((ach) => {
-      if (!progress.unlockedAchievements.includes(ach.id) && ach.condition(progress)) {
+      if (!currentUnlocked.includes(ach.id) && ach.condition(progress)) {
         newlyUnlocked.push(ach.id);
       }
     });
@@ -121,7 +149,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (newlyUnlocked.length > 0) {
       setProgress((prev) => ({
         ...prev,
-        unlockedAchievements: [...prev.unlockedAchievements, ...newlyUnlocked],
+        unlockedAchievements: [...(prev.unlockedAchievements || []), ...newlyUnlocked],
       }));
       const firstAch = achievementsList.find((a) => a.id === newlyUnlocked[0]);
       if (firstAch) {
@@ -157,6 +185,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } catch {
       // ignore
     }
+  };
+
+  const toggleTheme = () => {
+    setThemeState((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      try {
+        const saved = localStorage.getItem(SETTINGS_KEY);
+        const obj = saved ? JSON.parse(saved) : {};
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...obj, theme: next }));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
   };
 
   const selectLesson = (id: string) => {
@@ -308,10 +350,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectLesson,
         filterEngine,
         setFilterEngine,
+        filterLevel,
+        setFilterLevel,
         language,
         setLanguage,
         theme,
         setTheme,
+        toggleTheme,
         searchModalOpen,
         setSearchModalOpen,
         progress,

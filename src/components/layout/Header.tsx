@@ -30,8 +30,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu }) => {
     setFilterEngine,
   } = useApp();
 
-  const bookmarkCount = progress.bookmarkedLessonIds.length;
-  const notesCount = Object.keys(progress.notes).length;
+  const bookmarkCount = (progress?.bookmarkedLessonIds || []).length;
+  const notesCount = Object.keys(progress?.notes || {}).length;
 
   return (
     <header

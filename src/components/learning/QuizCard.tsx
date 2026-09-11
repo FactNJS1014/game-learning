@@ -103,13 +103,13 @@ export const QuizCard: React.FC<QuizCardProps> = ({ lessonId, quiz, language }) 
                   {qIdx + 1}
                 </span>
                 <p className="text-xs font-semibold text-slate-100">
-                  {q.question[language] || q.question.en}
+                  {q.question ? (q.question[language] || q.question.en) : ''}
                 </p>
               </div>
 
               {/* Options */}
               <div className="space-y-2 ml-9">
-                {(q.options[language] || q.options.en).map((option, oIdx) => {
+                {(q.options ? (q.options[language] || q.options.en || []) : []).map((option, oIdx) => {
                   const isSelected = selectedOption === oIdx;
                   let optionStyle = 'border-slate-800 bg-slate-900/80 hover:border-slate-700 hover:bg-slate-850 text-slate-300';
 
@@ -152,7 +152,7 @@ export const QuizCard: React.FC<QuizCardProps> = ({ lessonId, quiz, language }) 
                     <strong className="text-white block mb-0.5">
                       {language === 'th' ? 'คำอธิบาย:' : 'Explanation:'}
                     </strong>
-                    <p className="text-slate-400">{q.explanation[language] || q.explanation.en}</p>
+                    <p className="text-slate-400">{q.explanation ? (q.explanation[language] || q.explanation.en) : ''}</p>
                   </div>
                 </div>
               )}

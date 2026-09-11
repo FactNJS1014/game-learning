@@ -23,7 +23,7 @@ export const HomeView: React.FC = () => {
   const { language, setActiveTab, setFilterEngine, selectLesson, progress } = useApp();
 
   const totalLessons = allLessons.length;
-  const completedCount = progress.completedLessonIds.length;
+  const completedCount = (progress?.completedLessonIds || []).length;
   const percent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
@@ -54,7 +54,6 @@ export const HomeView: React.FC = () => {
             <button
               onClick={() => {
                 selectLesson('unity-zero-001');
-                setActiveTab('learning');
               }}
               className="flex items-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-xs sm:text-sm font-bold text-white transition hover:bg-red-500 shadow-xl shadow-red-950/50"
             >

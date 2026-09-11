@@ -7,7 +7,8 @@ import { BookOpen, Trash2, ArrowRight, Clock } from 'lucide-react';
 export const NotesView: React.FC = () => {
   const { language, progress, deleteNote, selectLesson, setActiveTab } = useApp();
 
-  const noteEntries = Object.entries(progress.notes) as [string, NoteItem][];
+  const noteEntries = (Object.entries(progress?.notes || {}) as [string, NoteItem][])
+    .filter(([_, note]) => note && typeof note.content === 'string' && note.content.trim());
 
   return (
     <div id="notes-view-container" className="mx-auto max-w-4xl py-6 px-4">
@@ -39,10 +40,10 @@ export const NotesView: React.FC = () => {
               : 'Open any lesson and scroll to section 13 ("My Lesson Notes") to jot down observations.'}
           </p>
           <button
-            onClick={() => setActiveTab('learning')}
+            onClick={() => setActiveTab('catalog')}
             className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500 transition"
           >
-            Start Learning
+            {language === 'th' ? 'เลือกดูบทเรียนทั้งหมด' : 'Start Learning'}
           </button>
         </div>
       ) : (

@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Layout } from './components/layout/Layout';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { HomeView } from './pages/HomeView';
 import { DashboardView } from './pages/DashboardView';
 import { CatalogView } from './pages/CatalogView';
@@ -25,12 +26,13 @@ const AppContent: React.FC = () => {
         return <HomeView />;
       case 'dashboard':
         return <DashboardView />;
+      case 'catalog':
       case 'learning':
-      case 'lesson':
-        return selectedLessonId ? <LessonView /> : <CatalogView />;
       case 'unity':
       case 'unreal':
         return <CatalogView />;
+      case 'lesson':
+        return selectedLessonId ? <LessonView /> : <CatalogView />;
       case 'projects':
         return <ProjectsView />;
       case 'project-builder':
@@ -56,7 +58,11 @@ const AppContent: React.FC = () => {
     }
   };
 
-  return <Layout>{renderActiveView()}</Layout>;
+  return (
+    <ErrorBoundary>
+      <Layout>{renderActiveView()}</Layout>
+    </ErrorBoundary>
+  );
 };
 
 export default function App() {

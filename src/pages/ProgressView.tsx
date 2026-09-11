@@ -19,12 +19,13 @@ import { QuizScoreRecord } from '../types';
 export const ProgressView: React.FC = () => {
   const { language, progress, selectLesson, setActiveTab } = useApp();
 
+  const completedLessonIds = progress?.completedLessonIds || [];
   const totalLessons = allLessons.length;
-  const completedCount = progress.completedLessonIds.length;
+  const completedCount = completedLessonIds.length;
   const percent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   const unlockedCount = achievementsList.filter(
-    (item) => progress.unlockedAchievements?.includes(item.id) || item.condition(progress)
+    (item) => progress?.unlockedAchievements?.includes(item.id) || item.condition(progress)
   ).length;
 
   const renderIcon = (iconName: string) => {
@@ -160,13 +161,13 @@ export const ProgressView: React.FC = () => {
           {language === 'th' ? 'ประวัติคะแนนแบบทดสอบ (Quiz Records)' : 'Quiz Mastery Records'}
         </h2>
 
-        {Object.keys(progress.quizScores).length === 0 ? (
+        {Object.keys(progress?.quizScores || {}).length === 0 ? (
           <p className="text-xs text-slate-500 italic py-4">
             No quiz scores recorded yet. Complete quizzes at the end of lessons to record scores.
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {(Object.entries(progress.quizScores) as [string, QuizScoreRecord][]).map(
+            {(Object.entries(progress?.quizScores || {}) as [string, QuizScoreRecord][]).map(
               ([lessonId, qData]) => {
                 const l = getLessonById(lessonId);
                 return (

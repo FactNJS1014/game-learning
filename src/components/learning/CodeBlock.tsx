@@ -76,8 +76,10 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ example, language }) => {
           </div>
           <ul className="space-y-1.5">
             {(() => {
-              const expl = example.explanation[language] || example.explanation.en;
-              const items = Array.isArray(expl) ? expl : [expl];
+              const expl = typeof example.explanation === 'string'
+                ? example.explanation
+                : (example.explanation ? (example.explanation[language] || example.explanation.en) : '');
+              const items = Array.isArray(expl) ? expl : (expl ? [expl] : []);
               return items.map((item, idx) => (
                 <li
                   key={idx}

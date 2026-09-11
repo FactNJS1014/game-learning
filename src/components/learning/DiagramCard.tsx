@@ -53,10 +53,10 @@ export const DiagramCard: React.FC<DiagramCardProps> = ({ diagram, language }) =
           </div>
           <div>
             <h4 className="text-sm font-bold text-white">
-              {diagram.title[language] || diagram.title.en}
+              {diagram.title ? (diagram.title[language] || diagram.title.en) : ''}
             </h4>
             <p className="text-xs text-slate-400">
-              {diagram.description[language] || diagram.description.en}
+              {diagram.description ? (diagram.description[language] || diagram.description.en) : ''}
             </p>
           </div>
         </div>

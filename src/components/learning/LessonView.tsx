@@ -28,6 +28,7 @@ export const LessonView: React.FC = () => {
   const {
     selectedLessonId,
     selectLesson,
+    setActiveTab,
     language,
     progress,
     markLessonComplete,
@@ -44,7 +45,7 @@ export const LessonView: React.FC = () => {
   // Mini challenge solution reveal
   const [showChallengeSolution, setShowChallengeSolution] = useState(false);
   // User note text
-  const currentNote = progress.notes[lesson?.id || '']?.content || '';
+  const currentNote = (progress.notes || {})[lesson?.id || '']?.content || '';
   const [noteContent, setNoteContent] = useState(currentNote);
   const [noteChanged, setNoteChanged] = useState(false);
 
@@ -60,17 +61,20 @@ export const LessonView: React.FC = () => {
       <div className="flex h-96 flex-col items-center justify-center p-8 text-center">
         <p className="text-slate-400">Lesson not found.</p>
         <button
-          onClick={() => selectLesson('unity-zero-001')}
+          onClick={() => {
+            selectLesson('unity-zero-001');
+            setActiveTab('catalog');
+          }}
           className="mt-4 rounded-xl bg-red-600 px-4 py-2 text-xs font-semibold text-white"
         >
-          Return to Lesson 01
+          Return to Catalog
         </button>
       </div>
     );
   }
 
-  const isCompleted = progress.completedLessonIds.includes(lesson.id);
-  const isBookmarked = progress.bookmarkedLessonIds.includes(lesson.id);
+  const isCompleted = (progress.completedLessonIds || []).includes(lesson.id);
+  const isBookmarked = (progress.bookmarkedLessonIds || []).includes(lesson.id);
 
   const togglePracticeTask = (taskId: string) => {
     setCompletedPracticeTasks((prev) => ({
@@ -86,6 +90,17 @@ export const LessonView: React.FC = () => {
 
   return (
     <div id="lesson-view-container" className="mx-auto max-w-4xl py-6 px-4 sm:px-6">
+      {/* Back to Catalog Navigation */}
+      <div className="mb-3">
+        <button
+          onClick={() => setActiveTab('catalog')}
+          className="group inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition"
+        >
+          <ChevronLeft className="h-4 w-4 transition group-hover:-translate-x-0.5 text-amber-400" />
+          <span>{language === 'th' ? 'กลับสู่รายการหลักสูตรทั้งหมด' : 'Back to All Lessons'}</span>
+        </button>
+      </div>
+
       {/* Top Breadcrumb & Engine Tag */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2 text-slate-400">
@@ -248,65 +263,75 @@ export const LessonView: React.FC = () => {
       </div>
 
       {/* 03. START FROM ZERO (Instructor Explanation: WHAT, WHY, HOW, WHEN) */}
-      <div className="my-8 rounded-3xl border border-amber-500/30 bg-amber-950/10 p-6 sm:p-7 shadow-lg">
-        <div className="flex items-center gap-2.5 mb-4">
-          <span className="rounded-lg bg-amber-500/20 p-2 text-amber-400">
-            <Sparkles className="h-5 w-5" />
-          </span>
-          <div>
-            <h2 className="text-base sm:text-lg font-bold text-white">
-              03. {language === 'th' ? 'ปูพื้นฐานจากศูนย์ (Start From Zero)' : 'Start From Zero: The Core Foundation'}
-            </h2>
-            <p className="text-xs text-amber-300/80">
-              {language === 'th'
-                ? 'อธิบายอย่างละเอียดเสมือนมี Instructor ส่วนตัวประกบข้าง ตอบคำถาม What, Why, How, When'
-                : 'Instructor guidance covering What, Why, How, and When before touching code.'}
-            </p>
+      {lesson.zeroExplanation && (
+        <div className="my-8 rounded-3xl border border-amber-500/30 bg-amber-950/10 p-6 sm:p-7 shadow-lg">
+          <div className="flex items-center gap-2.5 mb-4">
+            <span className="rounded-lg bg-amber-500/20 p-2 text-amber-400">
+              <Sparkles className="h-5 w-5" />
+            </span>
+            <div>
+              <h2 className="text-base sm:text-lg font-bold text-white">
+                03. {language === 'th' ? 'ปูพื้นฐานจากศูนย์ (Start From Zero)' : 'Start From Zero: The Core Foundation'}
+              </h2>
+              <p className="text-xs text-amber-300/80">
+                {language === 'th'
+                  ? 'อธิบายอย่างละเอียดเสมือนมี Instructor ส่วนตัวประกบข้าง ตอบคำถาม What, Why, How, When'
+                  : 'Instructor guidance covering What, Why, How, and When before touching code.'}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* WHAT */}
+            {lesson.zeroExplanation.what && (
+              <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
+                  WHAT — {language === 'th' ? 'มันคืออะไร?' : 'What is it?'}
+                </div>
+                <p className="text-xs leading-relaxed text-slate-300">
+                  {lesson.zeroExplanation.what[language] || lesson.zeroExplanation.what.en}
+                </p>
+              </div>
+            )}
+
+            {/* WHY */}
+            {lesson.zeroExplanation.why && (
+              <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
+                  WHY — {language === 'th' ? 'ทำไมถึงจำเป็นในเกม?' : 'Why do we need it?'}
+                </div>
+                <p className="text-xs leading-relaxed text-slate-300">
+                  {lesson.zeroExplanation.why[language] || lesson.zeroExplanation.why.en}
+                </p>
+              </div>
+            )}
+
+            {/* HOW */}
+            {lesson.zeroExplanation.how && (
+              <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
+                  HOW — {language === 'th' ? 'ทำงานอย่างไร?' : 'How does it work?'}
+                </div>
+                <p className="text-xs leading-relaxed text-slate-300">
+                  {lesson.zeroExplanation.how[language] || lesson.zeroExplanation.how.en}
+                </p>
+              </div>
+            )}
+
+            {/* WHEN */}
+            {lesson.zeroExplanation.when && (
+              <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
+                <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
+                  WHEN — {language === 'th' ? 'ควรเลือกใช้เมื่อไร?' : 'When to use it?'}
+                </div>
+                <p className="text-xs leading-relaxed text-slate-300">
+                  {lesson.zeroExplanation.when[language] || lesson.zeroExplanation.when.en}
+                </p>
+              </div>
+            )}
           </div>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* WHAT */}
-          <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
-              WHAT — {language === 'th' ? 'มันคืออะไร?' : 'What is it?'}
-            </div>
-            <p className="text-xs leading-relaxed text-slate-300">
-              {lesson.zeroExplanation.what[language] || lesson.zeroExplanation.what.en}
-            </p>
-          </div>
-
-          {/* WHY */}
-          <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
-              WHY — {language === 'th' ? 'ทำไมถึงจำเป็นในเกม?' : 'Why do we need it?'}
-            </div>
-            <p className="text-xs leading-relaxed text-slate-300">
-              {lesson.zeroExplanation.why[language] || lesson.zeroExplanation.why.en}
-            </p>
-          </div>
-
-          {/* HOW */}
-          <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
-              HOW — {language === 'th' ? 'ทำงานอย่างไร?' : 'How does it work?'}
-            </div>
-            <p className="text-xs leading-relaxed text-slate-300">
-              {lesson.zeroExplanation.how[language] || lesson.zeroExplanation.how.en}
-            </p>
-          </div>
-
-          {/* WHEN */}
-          <div className="rounded-xl border border-amber-500/20 bg-slate-950/60 p-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-1">
-              WHEN — {language === 'th' ? 'ควรเลือกใช้เมื่อไร?' : 'When to use it?'}
-            </div>
-            <p className="text-xs leading-relaxed text-slate-300">
-              {lesson.zeroExplanation.when[language] || lesson.zeroExplanation.when.en}
-            </p>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* 04 & 05. Visual Diagram */}
       {lesson.diagram && (
@@ -626,12 +651,27 @@ export const LessonView: React.FC = () => {
           14. {language === 'th' ? 'สรุปเนื้อหาสำคัญ' : 'Lesson Summary'}
         </div>
         <ul className="space-y-1.5 mb-6">
-          {(lesson.summary[language] || lesson.summary.en).map((pt, i) => (
-            <li key={i} className="flex items-start gap-2 text-xs text-slate-300">
-              <span className="text-red-400 font-bold">•</span>
-              <span>{pt}</span>
-            </li>
-          ))}
+          {(() => {
+            const rawSummary = lesson.summary
+              ? (lesson.summary[language] || lesson.summary.en)
+              : (lesson.objectives ? (lesson.objectives[language] || lesson.objectives.en) : []);
+            const points = Array.isArray(rawSummary) ? rawSummary : (rawSummary ? [rawSummary] : []);
+            if (points.length === 0) {
+              const fallbackDesc = lesson.shortDescription ? (lesson.shortDescription[language] || lesson.shortDescription.en) : '';
+              return fallbackDesc ? (
+                <li className="flex items-start gap-2 text-xs text-slate-300">
+                  <span className="text-red-400 font-bold">•</span>
+                  <span>{fallbackDesc}</span>
+                </li>
+              ) : null;
+            }
+            return points.map((pt, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-slate-300">
+                <span className="text-red-400 font-bold">•</span>
+                <span>{pt}</span>
+              </li>
+            ));
+          })()}
         </ul>
 
         {/* Navigation Buttons: Previous & Next */}

@@ -272,6 +272,7 @@ export type ActiveTab =
   | 'home'
   | 'dashboard'
   | 'learning'
+  | 'catalog'
   | 'unity'
   | 'unreal'
   | 'lesson'

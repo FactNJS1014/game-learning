@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ActiveTab, EngineType } from '../../types';
+import { ActiveTab, EngineType, LevelType } from '../../types';
 import {
   LayoutDashboard,
   GraduationCap,
@@ -35,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     language,
     progress,
     setFilterEngine,
+    setFilterLevel,
   } = useApp();
 
   const [learningExpanded, setLearningExpanded] = useState(true);
@@ -42,15 +43,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [unrealExpanded, setUnrealExpanded] = useState(true);
 
   const unityTotal = allLessons.filter((l) => l.engine === 'unity').length;
-  const unityDone = progress.completedLessonIds.filter((id) => id.startsWith('unity-')).length;
+  const unityDone = (progress?.completedLessonIds || []).filter((id) => id?.startsWith('unity-')).length;
   const unityPercent = unityTotal > 0 ? Math.round((unityDone / unityTotal) * 100) : 0;
 
   const unrealTotal = allLessons.filter((l) => l.engine === 'unreal').length;
-  const unrealDone = progress.completedLessonIds.filter((id) => id.startsWith('unreal-')).length;
+  const unrealDone = (progress?.completedLessonIds || []).filter((id) => id?.startsWith('unreal-')).length;
   const unrealPercent = unrealTotal > 0 ? Math.round((unrealDone / unrealTotal) * 100) : 0;
 
-  const navigateTo = (tab: ActiveTab, engine?: EngineType) => {
+  const navigateTo = (tab: ActiveTab, engine?: EngineType | 'all', level?: LevelType | 'all') => {
     if (engine) setFilterEngine(engine);
+    if (level) setFilterLevel(level);
     setActiveTab(tab);
     onClose();
   };
@@ -124,6 +126,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <LayoutDashboard className="h-4 w-4 text-slate-400 group-hover:text-red-400" />
                 <span>{language === 'th' ? 'แดชบอร์ดการเรียน' : 'Dashboard'}</span>
               </button>
+              <button
+                id="nav-catalog-btn"
+                onClick={() => navigateTo('catalog', 'all', 'all')}
+                className={navItemClass(activeTab === 'catalog')}
+              >
+                <BookOpen className="h-4 w-4 text-slate-400 group-hover:text-amber-400" />
+                <span>{language === 'th' ? 'รวมหลักสูตรทั้งหมด' : 'All Curriculum'}</span>
+              </button>
             </div>
           </div>
 
@@ -144,15 +154,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 {/* Start From Zero Special Track */}
                 <button
                   id="nav-start-zero-btn"
-                  onClick={() => {
-                    setFilterEngine('all');
-                    navigateTo('learning');
-                  }}
-                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition ${
-                    activeTab === 'learning'
-                      ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-                      : 'text-amber-400/90 hover:bg-amber-500/10'
-                  }`}
+                  onClick={() => navigateTo('catalog', 'all', 'zero')}
+                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition text-amber-400/90 hover:bg-amber-500/10 border border-amber-500/20 bg-amber-500/5"
                 >
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-pulse" />
@@ -167,7 +170,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <div className="pt-1">
                   <div className="flex items-center justify-between rounded-md px-2 py-1 text-xs text-slate-300 hover:bg-slate-900/50">
                     <button
-                      onClick={() => navigateTo('unity', 'unity')}
+                      onClick={() => navigateTo('catalog', 'unity', 'all')}
                       className="flex items-center gap-2 font-semibold text-slate-200 hover:text-red-400"
                     >
                       <span className="h-2 w-2 rounded-full bg-red-500"></span>
@@ -181,32 +184,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   {unityExpanded && (
                     <div className="ml-3 mt-1 border-l border-slate-800 pl-3 space-y-0.5">
                       <button
-                        onClick={() => navigateTo('unity', 'unity')}
+                        onClick={() => navigateTo('catalog', 'unity', 'zero')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-red-400"
                       >
                         <span>0 — Absolute Beginner</span>
-                        <span className="text-[10px] text-slate-400">15</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                       <button
-                        onClick={() => navigateTo('unity', 'unity')}
+                        onClick={() => navigateTo('catalog', 'unity', 'basic')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-red-400"
                       >
                         <span>Basic (C# & 2D/3D)</span>
-                        <span className="text-[10px] text-slate-400">20</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                       <button
-                        onClick={() => navigateTo('unity', 'unity')}
+                        onClick={() => navigateTo('catalog', 'unity', 'intermediate')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-red-400"
                       >
                         <span>Intermediate Systems</span>
-                        <span className="text-[10px] text-slate-400">20</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                       <button
-                        onClick={() => navigateTo('unity', 'unity')}
+                        onClick={() => navigateTo('catalog', 'unity', 'advanced')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-red-400"
                       >
                         <span>Advanced Architecture</span>
-                        <span className="text-[10px] text-slate-400">20</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                     </div>
                   )}
@@ -216,7 +219,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <div className="pt-1">
                   <div className="flex items-center justify-between rounded-md px-2 py-1 text-xs text-slate-300 hover:bg-slate-900/50">
                     <button
-                      onClick={() => navigateTo('unreal', 'unreal')}
+                      onClick={() => navigateTo('catalog', 'unreal', 'all')}
                       className="flex items-center gap-2 font-semibold text-slate-200 hover:text-blue-400"
                     >
                       <span className="h-2 w-2 rounded-full bg-blue-500"></span>
@@ -230,32 +233,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   {unrealExpanded && (
                     <div className="ml-3 mt-1 border-l border-slate-800 pl-3 space-y-0.5">
                       <button
-                        onClick={() => navigateTo('unreal', 'unreal')}
+                        onClick={() => navigateTo('catalog', 'unreal', 'zero')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-blue-400"
                       >
                         <span>0 — Absolute Beginner</span>
-                        <span className="text-[10px] text-slate-400">15</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                       <button
-                        onClick={() => navigateTo('unreal', 'unreal')}
+                        onClick={() => navigateTo('catalog', 'unreal', 'basic')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-blue-400"
                       >
                         <span>Basic (Blueprint)</span>
-                        <span className="text-[10px] text-slate-400">20</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                       <button
-                        onClick={() => navigateTo('unreal', 'unreal')}
+                        onClick={() => navigateTo('catalog', 'unreal', 'intermediate')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-blue-400"
                       >
                         <span>Intermediate & C++</span>
-                        <span className="text-[10px] text-slate-400">20</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                       <button
-                        onClick={() => navigateTo('unreal', 'unreal')}
+                        onClick={() => navigateTo('catalog', 'unreal', 'advanced')}
                         className="flex w-full items-center justify-between py-1 text-[11px] text-slate-400 hover:text-blue-400"
                       >
                         <span>Advanced & Nanite</span>
-                        <span className="text-[10px] text-slate-400">20</span>
+                        <span className="text-[10px] text-slate-400">5</span>
                       </button>
                     </div>
                   )}

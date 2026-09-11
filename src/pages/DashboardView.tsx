@@ -20,32 +20,33 @@ import {
 export const DashboardView: React.FC = () => {
   const { language, progress, selectLesson, setActiveTab } = useApp();
 
+  const completedLessonIds = progress?.completedLessonIds || [];
   const totalLessons = allLessons.length;
-  const completedCount = progress.completedLessonIds.length;
+  const completedCount = completedLessonIds.length;
   const overallPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   // Unity specific
   const unityTotal = allLessons.filter((l) => l.engine === 'unity').length;
-  const unityDone = progress.completedLessonIds.filter((id) => id.startsWith('unity-')).length;
+  const unityDone = completedLessonIds.filter((id) => id?.startsWith('unity-')).length;
   const unityPercent = unityTotal > 0 ? Math.round((unityDone / unityTotal) * 100) : 0;
 
   // Unreal specific
   const unrealTotal = allLessons.filter((l) => l.engine === 'unreal').length;
-  const unrealDone = progress.completedLessonIds.filter((id) => id.startsWith('unreal-')).length;
+  const unrealDone = completedLessonIds.filter((id) => id?.startsWith('unreal-')).length;
   const unrealPercent = unrealTotal > 0 ? Math.round((unrealDone / unrealTotal) * 100) : 0;
 
   // Next recommended lesson to continue
   const nextPendingLesson =
-    allLessons.find((l) => !progress.completedLessonIds.includes(l.id)) || allLessons[0];
+    allLessons.find((l) => !completedLessonIds.includes(l.id)) || allLessons[0];
 
   // Recently completed lessons
-  const recentCompleted = progress.completedLessonIds
+  const recentCompleted = completedLessonIds
     .slice(-4)
     .map((id) => getLessonById(id))
     .filter(Boolean);
 
   // Quiz calculations
-  const quizScores = Object.values(progress.quizScores) as QuizScoreRecord[];
+  const quizScores = Object.values(progress?.quizScores || {}) as QuizScoreRecord[];
   const totalQuizzes = quizScores.length;
   const passedQuizzes = quizScores.filter((q) => q.passed).length;
   const averageQuizPercent =

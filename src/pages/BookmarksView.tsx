@@ -6,7 +6,7 @@ import { Bookmark, ArrowRight, BookmarkX, Clock } from 'lucide-react';
 export const BookmarksView: React.FC = () => {
   const { language, progress, toggleBookmark, selectLesson, setActiveTab } = useApp();
 
-  const bookmarkedLessons = progress.bookmarkedLessonIds
+  const bookmarkedLessons = (progress?.bookmarkedLessonIds || [])
     .map((id) => getLessonById(id))
     .filter(Boolean);
 
@@ -40,10 +40,10 @@ export const BookmarksView: React.FC = () => {
               : 'Click the bookmark icon on any lesson to save it here for quick access.'}
           </p>
           <button
-            onClick={() => setActiveTab('learning')}
+            onClick={() => setActiveTab('catalog')}
             className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-500 transition"
           >
-            Browse Lessons
+            {language === 'th' ? 'เลือกดูบทเรียนทั้งหมด' : 'Browse Lessons'}
           </button>
         </div>
       ) : (
